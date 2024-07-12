@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Cargas{% endblock %}
+
+{% block content %}
+<h2>Sus cargas familiares:</h2>
+      <hr>
+      <table class="table">
+        <thead>
+            <th>Nombre</th>
+            <th>Parentesco</th>
+            <th>Sexo</th>
+            <th>RUT familiar</th>
+            <th>Acciones</th>
+          </thead>
+          <tbody>
+            {% for carga_familiar in cargas_familiares %}  
+            <tr>
+                <td>{{ carga_familiar.nombre }}</td>
+                <td>{{ carga_familiar.parentesco }}</td>
+                <td>{{ carga_familiar.sexo }}</td>
+                <td>{{ carga_familiar.rut_familiar }}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="eliminarCarga('{{ carga_familiar.id }}')">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      <script type="text/javascript">
+        function eliminarCarga(id) {
+            fetch('/eliminar_carga/' + id, {
+                method: 'DELETE'
+            }).then(response => { 
+                if (response.ok) {
+                    window.location.reload();
+                }else{
+                    console.error('Error al eliminar la carga id: ',id);
+                }
+            })
+                .catch(error => {
+                    console.error('Error durante el fetching', error);
+                })
+        }
+
+      </script>
+      {% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Cargas{% endblock %}
+
+{% block content %}
+<h2>¿Está seguro de eliminar esta carga?</h2>
+<table class="table">
+    <thead>
+        <th>Nombre</th>
+        <th>Parentesco</th>
+        <th>Sexo</th>
+        <th>RUT familiar</th>
+      </thead>
+      <tbody> 
+        <tr>
+            <td>{{ usuario.carga_familiar.nombre }}</td>
+            <td>{{ usuario.carga_familiar.parentesco }}</td>
+            <td>{{ usuario.carga_familiar.sexo }}</td>
+            <td>{{ usuario.carga_familiar.rut_familiar }}</td>
+        </tr>
+
+    </tbody>
+  </table>
+{% endblock %}

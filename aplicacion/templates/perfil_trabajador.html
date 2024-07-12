@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Perfil del trabajador{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Aquí mostrar los datos del trabajador -->
+    <h2>Sus datos de usuario:</h2>
+    <hr>
+    <table class="table">
+        <thead>
+          <th>RUT</th>
+          <th>DV</th>
+          <th>username</th>
+          <th>password</th>
+          <th>Rol</th>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{ usuario.rut }}</td>
+          <td>{{ usuario.dv }}</td>
+          <td>{{ usuario.username }}</td>
+          <td>{{ usuario.password }}</td>
+          <td>{{ usuario.role }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <h2>Sus datos personales:</h2>
+      <hr>
+    <table class="table">
+        <thead>
+          <th>Nombre completo</th>
+          <th>Sexo</th>
+          <th>Dirección</th>
+          <th>Telefono</th>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{ usuario.datos_personales.nombre_completo }}</td>
+          <td>{{ usuario.datos_personales.sexo }}</td>
+          <td>{{ usuario.datos_personales.direccion }}</td>
+          <td>{{ usuario.datos_personales.telefono }}</td>
+        </tr>
+        </tbody>
+      </table class="table">
+      <h2>Sus datos laborales:</h2>
+      <hr>
+      <table class="table">
+        <thead>
+            <th>Cargo</th>
+            <th>Fecha de ingreso</th>
+            <th>Área</th>
+            <th>Departamento</th>
+          </thead>
+          <tbody>
+          <tr>
+            <td>{{ usuario.datos_laborales.cargo }}</td>
+            <td>{{ usuario.datos_laborales.fecha_ingreso }}</td>
+            <td>{{ usuario.datos_laborales.area }}</td>
+            <td>{{ usuario.datos_laborales.departamento }}</td>
+          </tr>
+        </tbody>
+      </table class="table">
+      <h2>Sus cargas familiares:</h2>
+      <hr>
+      <table class="table">
+        <thead>
+            <th>Nombre</th>
+            <th>Parentesco</th>
+            <th>Sexo</th>
+            <th>RUT familiar</th>
+          </thead>
+          <tbody>
+            {% for carga_familiar in cargas_familiares %}  
+            <tr>
+                <td>{{ carga_familiar.nombre }}</td>
+                <td>{{ carga_familiar.parentesco }}</td>
+                <td>{{ carga_familiar.sexo }}</td>
+                <td>{{ carga_familiar.rut_familiar }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      <h2>Sus contactos de emergencia:</h2>
+      <hr>
+      <table class="table">
+        <thead>
+            <th>Nombre</th>
+            <th>Relación</th>
+            <th>Telefono</th>
+
+          </thead>
+          <tbody>
+          <tr>
+            <td>{{ usuario.contacto_emergencia.nombre }}</td>
+            <td>{{ usuario.contacto_emergencia.relacion }}</td>
+            <td>{{ usuario.contacto_emergencia.telefono }}</td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+{% endblock %}

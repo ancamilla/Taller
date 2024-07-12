@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios</title>
+</head>
+<body>
+    <h1>Lista de Usuarios</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>RUT</th>
+                <th>DV</th>
+                <th>Nombre Completo</th>
+                <th>Sexo</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Usuario</th>
+                <th>Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.rut }}</td>
+                <td>{{ usuario.dv }}</td>
+                <td>{{ usuario.nombre_completo }}</td>
+                <td>{{ usuario.sexo }}</td>
+                <td>{{ usuario.direccion }}</td>
+                <td>{{ usuario.telefono }}</td>
+                <td>{{ usuario.usuario }}</td>
+                <td>{{ usuario.tipo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+
