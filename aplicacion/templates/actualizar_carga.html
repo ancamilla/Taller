@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Perfil del trabajador{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Actualizar Cargas</h2>
+    <hr>
+    <form action="{{ url_for('actualizar_cargas', id_carga=carga.id) }}" method="POST"> <!--Linkeamos con el @app.route('random'): -- def listar_cargas():... que vendria siendo   @app.route('/perfil_trabajador/cargas', methods=['GET', 'POST','DELETE'])-->
+        <label for="nombre_txt" class="form-label">Nombre: </label>
+        <input class="form-control" type="text" name="nombre" required="required" placeholder="Nombre Completo..." id="nombre_txt" aria-label="default input example" value="{{carga.nombre}}">
+        <label for="parentesco_txt" class="form-label">Parentesco: </label>
+        <input class="form-control" type="text" name="parentesco" required="required" placeholder="parentesco..." id="parentesco_txt" aria-label="default input example" value="{{carga.parentesco}}">
+        <label for="sexo_txt" class="form-label">Sexo: </label>
+        <input class="form-control" type="text" name="sexo" required="required" placeholder="sexo..." id="sexo_txt" aria-label="default input example" value="{{carga.sexo}}">
+        <label for="rut_txt" class="form-label">RUT: </label>
+        <input class="form-control" type="number" name="rut" required="required" placeholder="RUT de la carga..." id="rut_txt" aria-label="default input example" value="{{carga.rut_familiar}}">
+        <input type="submit" value="Agregar">
+    </form>
+</div>
+{% endblock %}

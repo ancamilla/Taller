@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Contactos{% endblock %}
+
+{% block content %}
+<h2>Sus contactos de emergencias son:</h2>
+      <hr>
+      <table class="table">
+        <thead>
+            <th>Nombre</th>
+            <th>Relación</th>
+            <th>Telefono</th>
+            <th>Acciones</th>
+          </thead>
+          <tbody>
+            {% for contacto in contactos_emergencias %}  
+            <tr>
+                <td>{{ contacto.nombre }}</td>
+                <td>{{ contacto.relacion }}</td>
+                <td>{{ contacto.telefono }}</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" href="{{ url_for('actualizar_contactos', id_contacto=contacto.id) }}">Actualizar</a>
+                    <a class="btn btn-danger btn-sm" href="{{ url_for('confirmar_eliminar_contacto', id_contacto=contacto.id) }}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      
+      {% endblock %}

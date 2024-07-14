@@ -20,27 +20,12 @@
                 <td>{{ carga_familiar.sexo }}</td>
                 <td>{{ carga_familiar.rut_familiar }}</td>
                 <td>
-                    <button class="btn btn-danger" onclick="eliminarCarga('{{ carga_familiar.id }}')">Eliminar</button>
+                    <a class="btn btn-warning btn-sm" href="{{ url_for('actualizar_cargas', id_carga=carga_familiar.id) }}">Actualizar</a>
+                    <a class="btn btn-danger btn-sm" href="{{ url_for('confirmar_eliminar_carga', id_carga=carga_familiar.id) }}">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
       </table>
-      <script type="text/javascript">
-        function eliminarCarga(id) {
-            fetch('/eliminar_carga/' + id, {
-                method: 'DELETE'
-            }).then(response => { 
-                if (response.ok) {
-                    window.location.reload();
-                }else{
-                    console.error('Error al eliminar la carga id: ',id);
-                }
-            })
-                .catch(error => {
-                    console.error('Error durante el fetching', error);
-                })
-        }
-
-      </script>
+      
       {% endblock %}

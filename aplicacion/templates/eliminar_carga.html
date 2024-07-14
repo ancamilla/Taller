@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Cargas{% endblock %}
+
+{% block content %}
+<h2>¿Está seguro de eliminar esta carga?</h2>
+<table class="table">
+    <thead>
+        <th>Nombre</th>
+        <th>Parentesco</th>
+        <th>Sexo</th>
+        <th>RUT familiar</th>
+      </thead>
+      <tbody> 
+        <tr class="table-danger">
+            <td>{{ carga.nombre }}</td>
+            <td>{{ carga.parentesco }}</td>
+            <td>{{ carga.sexo }}</td>
+            <td>{{ carga.rut_familiar }}</td>
+        </tr>
+
+    </tbody>
+  </table>
+  <form action="{{ url_for('eliminar_carga', id=id_carga) }}" method="POST">
+    <input type="hidden" name="_method" value="DELETE">
+    <button class="btn btn-danger btn-sm">Eliminar</button>
+  <!-- <button class="btn btn-danger btn-sm" onclick="eliminarCarga('{{ id_carga }}')">Eliminar</button> -->
+{% endblock %}
