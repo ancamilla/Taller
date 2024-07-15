@@ -32,7 +32,7 @@ def register_routes(app, db):
                 print(f"Usuario {username} logueado exitosamente.")
                 # Ejemplo de redirección basada en el rol del usuario
                 if usuario.role == 'Trabajador':
-                    return redirect(url_for('perfil_trabajador'))
+                    return redirect(url_for('perfil'))
                 elif usuario.role == 'JefeRRHH':
                     return redirect(url_for('perfil_jefe_rrhh', next=request.endpoint))
                 elif usuario.role == 'PersonalRRHH':
@@ -49,15 +49,53 @@ def register_routes(app, db):
         return render_template('perfil_personal_rrhh.html')
     
         # Ruta para el perfil del trabajador
-    @app.route('/perfil_trabajador')
-    def perfil_trabajador():
+    @app.route('/perfil')
+    def perfil():
         # Lógica para obtener y mostrar el perfil del trabajador
         user_id = session.get('user_id')
         if not user_id:
             return redirect(url_for('login'))
         usuario = Usuario.query.filter_by(rut=user_id).first()
         cargas_familiares = usuario.cargas_familiares
-        return render_template('perfil_trabajador.html', usuario=usuario, cargas_familiares=cargas_familiares)
+        contactos_emergencias = usuario.contacto_emergencia
+        datos_personales = usuario.datos_personales
+        return render_template('perfil.html', usuario=usuario, cargas_familiares=cargas_familiares, contactos_emergencias = contactos_emergencias, datos_personales = datos_personales)
+
+ # Ruta para los datos personales
+    @app.route('/datos_personales', methods=['GET', 'POST','DELETE'])
+    def datos_personales():
+        # Lógica para obtener y mostrar el perfil del trabajador
+        user_id = session.get('user_id')
+        if not user_id:
+            return redirect(url_for('login'))
+        usuario = Usuario.query.filter_by(rut=user_id).first()
+        return render_template('datos_personales.html', usuario=usuario )
+
+    @app.route('/datos_personales/actualizar/<int:rut>', methods=['GET', 'POST'])
+    def actualizar_datos_personales(rut):
+        # Lógica para obtener y mostrar el perfil del trabajador
+        user_id = session.get('user_id')
+        if not user_id:
+            return redirect(url_for('login'))
+        usuario = Usuario.query.filter_by(rut=user_id).first()
+        datos_personales = DatosPersonales.query.filter_by(rut=user_id) #Como uselist:False, se debe llamar a los datos personales como usuario.datos_personales.telefono 
+        if request.method == 'POST':
+            usuario.datos_personales.nombre_completo = request.form.get('nombre') #Captura dato name="" desde forma en html
+            usuario.datos_personales.sexo = request.form.get('sexo')
+            usuario.datos_personales.direccion = request.form.get('direccion')
+            usuario.datos_personales.telefono = int(request.form.get('telefono')) 
+            usuario.datos_personales.RUT = int(usuario.rut)
+            try:
+                db.session.commit()
+                flash('Datos actualizados exitosamente', 'success')
+                return redirect(url_for('datos_personales'))
+            except:
+                db.session.rollback()
+                flash('Hubo un problema actualizando los datos', 'danger')
+                return "Hubo un problema actualizando los datos"
+        else:
+            return render_template('actualizar_datos_personales.html', usuario=usuario, datos = datos_personales )
+    
 
     @app.route('/cargas', methods=['GET', 'POST','DELETE'])
     def listar_cargas(): #Este metodo se comunica con las plantillas html al usar (url_for{{''}} en html), en el caso de esta ruta, se comunica con agregar_cargas.html 
@@ -81,10 +119,11 @@ def register_routes(app, db):
             flash('Carga añadida exitosamente', 'success')
             cargas_familiares = usuario.cargas_familiares #al haber una nueva carga actualiza la variable (en caso de (?) )
 # (!) Hace falta agregar un metodo de validacion, especialmente rut
+#(!) Tambien hace falta un metodo para manejar los errores al agregar una carga.
             return render_template('listar_cargas.html', usuario=usuario,cargas_familiares=cargas_familiares) #Carga plantilla listar_cargas.html 
         
     @app.route('/cargas/agregar', methods=['GET', 'POST']) #El navbar en base.html llama a la funcion agregar_cargas() la cual carga el archivo agregar_cargas.html y dicho archivo se comunica con la funcion listar_cargas() (Elif 'POST')
-    def agregar_cargas():
+    def agregar_cargas(): #Funcion que despues de ser llamada desde el navbar instancia los datos de la sesion y carga el html con el formulario para agregar cargas
         user_id = session.get('user_id')
         if not user_id:
             return redirect(url_for('login'))
@@ -92,14 +131,14 @@ def register_routes(app, db):
         cargas_familiares = usuario.cargas_familiares
         return render_template('agregar_cargas.html', usuario=usuario,cargas_familiares=cargas_familiares)
     
-    @app.route('/perfil_trabajador/cargas/actualizar/<int:id_carga>', methods=['GET', 'POST'])
+    @app.route('/perfil/cargas/actualizar/<int:id_carga>', methods=['GET', 'POST'])
     def actualizar_cargas(id_carga):
         user_id = session.get('user_id')
         if not user_id:
             return redirect(url_for('login'))
-        usuario = Usuario.query.filter_by(rut=user_id).first()
-        carga = CargasFamiliares.query.get(id_carga)
-        if request.method == 'POST':
+        usuario = Usuario.query.filter_by(rut=user_id).first() #Busca al usuario basado en la carga
+        carga = CargasFamiliares.query.get(id_carga) #Se instancia dicha carga
+        if request.method == 'POST': #actualizar_cargas.html se comunica con la funcion actualizar_cargas con un metodo 'POST'
             carga.nombre = request.form.get('nombre') #Captura dato name="" desde forma en html
             carga.parentesco = request.form.get('parentesco')
             carga.sexo = request.form.get('sexo')
@@ -112,7 +151,7 @@ def register_routes(app, db):
             except:
                 flash('Hubo un problema actualizando la carga', 'danger')
                 return "Hubo un problema actualizando la carga."
-        else:
+        else: #Si no se envia un metodo 'POST' se carga el html para llenar formulario, junto a instancias de usuario y carga.
             return render_template('actualizar_carga.html', usuario=usuario,carga = carga)
     
 
@@ -162,8 +201,8 @@ def register_routes(app, db):
             contacto = ContactoEmergencia(nombre=nombre,relacion=relacion,telefono=telefono,rut=RUT) #Crea una nueva instancia del objeto ContactoEmergencia() 
             db.session.add(contacto) #dicha instancia se carga en la base datos
             db.session.commit() #commit;
-            flash('Contacto añadida exitosamente', 'success')
-            contactos_emergencias = usuario.contactos_emergencias #al haber una nueva carga actualiza la variable (en caso de (?) )
+            flash('Contacto añadido exitosamente', 'success')
+            contactos_emergencias = usuario.contacto_emergencia #al haber una nueva carga actualiza la variable (en caso de (?) )
 # (!) Hace falta agregar un metodo de validacion, especialmente rut
             return render_template('listar_contactos.html', usuario=usuario,contactos_emergencias=contactos_emergencias) #Carga plantilla listar_cargas.html 
     @app.route('/contactos_emergencias/agregar', methods=['GET', 'POST']) #El navbar en base.html llama a la funcion agregar_cargas() la cual carga el archivo agregar_cargas.html y dicho archivo se comunica con la funcion listar_cargas() (Elif 'POST')
@@ -172,7 +211,7 @@ def register_routes(app, db):
         if not user_id:
             return redirect(url_for('login'))
         usuario = Usuario.query.filter_by(rut=user_id).first()
-        contactos_emergencias = usuario.contactos_emergencias
+        contactos_emergencias = usuario.contacto_emergencia
         return render_template('agregar_contactos.html', usuario=usuario,contactos_emergencias=contactos_emergencias)
     
     @app.route('/contactos_emergencias/actualizar/<int:id_contacto>', methods=['GET', 'POST'])

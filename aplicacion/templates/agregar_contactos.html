@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container">
-    <h2>Agregar Contactos de emergencia</h2>
+    <h2>Agregar Contacto de emergencia</h2>
     <hr>
     <form action="{{ url_for('listar_contactos') }}" method="POST"> <!--Linkeamos con el @app.route('random'): -- def listar_contactos():... que vendria siendo   @app.route('/perfil_trabajador/cargas', methods=['GET', 'POST','DELETE'])-->
         <label for="nombre_txt" class="form-label">Nombre: </label>

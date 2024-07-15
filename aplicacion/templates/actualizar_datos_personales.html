@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Perfil del trabajador{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Actualizar datos_personales</h2>
+    <hr>
+    <form action="{{ url_for('actualizar_datos_personales', rut=usuario.rut) }}" method="POST"> <!--Linkeamos con el @app.route('random'): -- def listar_datos_personales():... que vendria siendo   @app.route('/perfil/datos_personales', methods=['GET', 'POST','DELETE'])-->
+        <label for="nombre_txt" class="form-label">Nombre Completo: </label>
+        <input class="form-control" type="text" name="nombre" required="required" placeholder="Nombre Completo..." id="nombre_txt" aria-label="default input example" value="{{usuario.datos_personales.nombre_completo}}">
+        <label for="sexo_txt" class="form-label">sexo: </label>
+        <input class="form-control" type="text" name="sexo" required="required" placeholder="sexo..." id="sexo_txt" aria-label="default input example" value="{{usuario.datos_personales.sexo}}">
+        <label for="direccion_txt" class="form-label">direccion: </label>
+        <input class="form-control" type="text" name="direccion" required="required" placeholder="direccion..." id="direccion_txt" aria-label="default input example" value="{{usuario.datos_personales.direccion}}">
+        <label for="telefono_txt" class="form-label">Telefono: </label>
+        <input class="form-control" type="number" name="telefono" required="required" placeholder="Telefono..." id="telefono_txt" aria-label="default input example" value="{{usuario.datos_personales.telefono}}">
+        <input type="submit" value="Actualizar">
+    </form>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Cargas{% endblock %}
+{% block title %}contactos{% endblock %}
 
 {% block content %}
 <h2>¿Está seguro de eliminar este contacto?</h2>
@@ -12,9 +12,9 @@
       </thead>
       <tbody> 
         <tr class="table-danger">
-            <td>{{ carga.nombre }}</td>
-            <td>{{ carga.relacion }}</td>
-            <td>{{ carga.telefono }}</td>
+            <td>{{ contacto.nombre }}</td>
+            <td>{{ contacto.relacion }}</td>
+            <td>{{ contacto.telefono }}</td>
         </tr>
 
     </tbody>

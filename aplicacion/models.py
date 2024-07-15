@@ -9,8 +9,7 @@ class Usuario(db.Model):
     password = db.Column(db.String(50), nullable=False)
     role = db.Column(db.String(50), nullable=False)
 
-    datos_personales = db.relationship("DatosPersonales", back_populates="usuario", uselist=False,
-                                    primaryjoin="Usuario.rut == DatosPersonales.rut")
+    datos_personales = db.relationship("DatosPersonales", back_populates="usuario", uselist=False)
     datos_laborales = db.relationship("DatosLaborales", back_populates="usuario", uselist=False)
     contacto_emergencia = db.relationship("ContactoEmergencia", back_populates="usuario", uselist=True)
     cargas_familiares = db.relationship("CargasFamiliares", back_populates="usuario", uselist=True)

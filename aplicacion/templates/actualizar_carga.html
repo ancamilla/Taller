@@ -5,7 +5,7 @@
 <div class="container">
     <h2>Actualizar Cargas</h2>
     <hr>
-    <form action="{{ url_for('actualizar_cargas', id_carga=carga.id) }}" method="POST"> <!--Linkeamos con el @app.route('random'): -- def listar_cargas():... que vendria siendo   @app.route('/perfil_trabajador/cargas', methods=['GET', 'POST','DELETE'])-->
+    <form action="{{ url_for('actualizar_cargas', id_carga=carga.id) }}" method="POST"> <!--Linkeamos con el @app.route('random'): -- def listar_cargas():... que vendria siendo   @app.route('/perfil/cargas', methods=['GET', 'POST','DELETE'])-->
         <label for="nombre_txt" class="form-label">Nombre: </label>
         <input class="form-control" type="text" name="nombre" required="required" placeholder="Nombre Completo..." id="nombre_txt" aria-label="default input example" value="{{carga.nombre}}">
         <label for="parentesco_txt" class="form-label">Parentesco: </label>

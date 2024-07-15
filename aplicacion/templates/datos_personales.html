@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Perfil del trabajador{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Aquí mostrar los datos del trabajador -->
+    <h2>Sus datos de usuario:</h2>
+    <hr>
+    <table class="table">
+        <thead>
+          <th>RUT</th>
+          <th>DV</th>
+          <th>username</th>
+          <th>password</th>
+          <th>Rol</th>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{ usuario.rut }}</td>
+          <td>{{ usuario.dv }}</td>
+          <td>{{ usuario.username }}</td>
+          <td>{{ usuario.password }}</td>
+          <td>{{ usuario.role }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <h2>Sus datos personales:</h2>
+      <hr>
+    <table class="table">
+        <thead>
+          <th>Nombre completo</th>
+          <th>Sexo</th>
+          <th>Dirección</th>
+          <th>Telefono</th>
+          <th>Opciones</th>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{ usuario.datos_personales.nombre_completo }}</td>
+          <td>{{ usuario.datos_personales.sexo }}</td>
+          <td>{{ usuario.datos_personales.direccion }}</td>
+          <td>{{ usuario.datos_personales.telefono }}</td>
+          <td>
+            <a class="btn btn-warning btn-sm" href="{{ url_for('actualizar_datos_personales', rut=usuario.rut) }}">Actualizar</a>
+          </td>
+        </tr>
+        </tbody>
+
+{% endblock %}
