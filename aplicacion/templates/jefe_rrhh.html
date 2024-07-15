@@ -1,0 +1,80 @@
+<!-- filtrar_usuarios.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Filtrar Usuarios</h2>
+<form method="POST" action="{{ url_for('bp.filtrar_usuarios') }}">
+    <div>
+        <label for="buscador">Buscar:</label>
+        <input type="text" id="buscador" name="buscador" placeholder="Buscar...">
+    </div>
+
+    <div>
+        <label for="sexo">Sexo:</label>
+        <select name="sexo" id="sexo" class="form-select" aria-label="Default select example">
+            <option value="">Seleccione Sexo</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="cargo" >Cargo:</label>
+        <select name="cargo" id="cargo" class="form-select" aria-label="Default select example">
+            <option value="">Seleccione Cargo</option>
+            {% for cargo in lista_cargos %}
+            <option value="{{ cargo }}">{{ cargo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label for="area">Área:</label>
+        <select name="area" id="area" class="form-select" aria-label="Default select example">
+            <option value="">Seleccione Área</option>
+            {% for area in lista_areas %}
+            <option value="{{ area }}">{{ area }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label for="departamento">Departamento:</label>
+        <select name="departamento" id="departamento" class="form-select" aria-label="Default select example">
+            <option value="">Seleccione Departamento</option>
+            {% for departamento in lista_departamentos %}
+            <option value="{{ departamento }}">{{ departamento }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<h2>Usuarios Filtrados</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>RUT</th>
+            <th>Nombre Completo</th>
+            <th>Sexo</th>
+            <th>Cargo</th>
+            <th>Área</th>
+            <th>Departamento</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.rut }}</td>
+            <td>{{ usuario.datos_personales.nombre_completo }}</td>
+            <td>{{ usuario.datos_personales.sexo }}</td>
+            <td>{{ usuario.datos_laborales.cargo }}</td>
+            <td>{{ usuario.datos_laborales.area }}</td>
+            <td>{{ usuario.datos_laborales.departamento }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

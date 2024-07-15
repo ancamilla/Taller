@@ -1,6 +1,9 @@
+from flask_login import UserMixin
 from app import db
 
-class Usuario(db.Model):
+
+
+class Usuario(UserMixin, db.Model):
     __tablename__ = 'Usuario'
 
     rut = db.Column(db.Integer, primary_key=True)
@@ -19,7 +22,15 @@ class Usuario(db.Model):
         db.CheckConstraint("role IN ('Trabajador', 'JefeRRHH', 'PersonalRRHH')"),
     )
     def __repr__(self):
-        return f'<Usuario {self.rut} - {self.username} - {self.role}>'
+        return f'<Usuario {self.rut} - {self.username} - {self.password} - {self.role}>'
+    def __init__(self, rut, dv, username, password, role):
+        self.rut = rut
+        self.dv = dv
+        self.username = username
+        self.password = password
+        self.role = role
+    def get_id(self):
+        return self.rut
 
 class DatosPersonales(db.Model):
     __tablename__ = 'DatosPersonales'

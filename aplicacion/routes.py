@@ -1,60 +1,49 @@
-from flask import render_template, request, session, redirect, url_for, flash
+from flask import render_template, request, session, redirect, url_for, flash, Blueprint
+from flask_login import login_required, current_user
 from sqlalchemy import text
 from hashlib import md5
 from app import cursor
 from models import Usuario, DatosLaborales, DatosPersonales, ContactoEmergencia, CargasFamiliares
+import hashlib
+
+bp = Blueprint('bp', __name__)
+bp_jefe_rrhh = Blueprint('jefe_rrhh', __name__)
+routes = Blueprint('routes', __name__)
 
 def register_routes(app, db):
 # Ruta para la página de inicio
     @app.route('/')
     def index():
         return render_template('index.html')
-    
-    # Ruta y vista para el login
-    @app.route('/login', methods=['GET', 'POST'])
-    def login():
-        alerta =''
-        if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
 
-            # Encriptación de la contraseña con MD5
-            hashed_password = md5(password.encode('utf-8')).hexdigest()
-            #cursor.execute('SELECT * FROM usuario where RUT=%s AND password=%s',(username,hashed_password))
-            usuario = Usuario.query.filter_by(rut=username, password=hashed_password).first()
-            tests = db.session.execute(text("SELECT username FROM usuario where RUT = 12345678"))
-           # usuario = cursor.fetchall()
-           # usuario = Usuario.query.filter_by(username=username).first()
-            if usuario:
-                session['loggedin']=True
-                session['user_id'] = usuario.rut
-                session['username'] = usuario.username
-                print(f"Usuario {username} logueado exitosamente.")
-                # Ejemplo de redirección basada en el rol del usuario
-                if usuario.role == 'Trabajador':
-                    return redirect(url_for('perfil'))
-                elif usuario.role == 'JefeRRHH':
-                    return redirect(url_for('perfil_jefe_rrhh', next=request.endpoint))
-                elif usuario.role == 'PersonalRRHH':
-                    return redirect(url_for('perfil_personal_rrhh'))
-            else:
-         
-                return render_template('errores.html', usuario = usuario, username=username, password=password, tests = tests )
-        
-        return render_template('login.html', alerta=alerta)
+    
+    @app.route('/logout')
+    def logout():
+    # Eliminar la sesión del usuario
+        session.pop('username', None)  # Elimina el valor de 'username' de la sesión
+    # O cualquier otra limpieza de sesión que necesites hacer
+        return redirect(url_for('index'))  # Redirige al inicio de sesión o a la página principal
     
     @app.route('/personal_rrhh')
+    @login_required
     def perfil_personal_rrhh():
-        # Lógica para rellenar datos por PersonalRRHH
-        return render_template('perfil_personal_rrhh.html')
-    
+        user_id = session.get('user_id')
+        if not user_id:
+            return redirect(url_for('auth.login'))
+        usuario = Usuario.query.filter_by(rut=user_id).first()
+        cargas_familiares = usuario.cargas_familiares
+        contactos_emergencias = usuario.contacto_emergencia
+        datos_personales = usuario.datos_personales
+        return render_template('perfil_personal_rrhh.html', usuario=usuario, cargas_familiares=cargas_familiares, contactos_emergencias = contactos_emergencias, datos_personales = datos_personales)
+
         # Ruta para el perfil del trabajador
     @app.route('/perfil')
+    @login_required
     def perfil():
         # Lógica para obtener y mostrar el perfil del trabajador
         user_id = session.get('user_id')
         if not user_id:
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
         usuario = Usuario.query.filter_by(rut=user_id).first()
         cargas_familiares = usuario.cargas_familiares
         contactos_emergencias = usuario.contacto_emergencia
@@ -63,6 +52,7 @@ def register_routes(app, db):
 
  # Ruta para los datos personales
     @app.route('/datos_personales', methods=['GET', 'POST','DELETE'])
+    @login_required
     def datos_personales():
         # Lógica para obtener y mostrar el perfil del trabajador
         user_id = session.get('user_id')
@@ -176,10 +166,7 @@ def register_routes(app, db):
 
 
 
-    @app.route('/jefe_rrhh')
-    def perfil_jefe_rrhh():
-        # Lógica para listar trabajadores filtrados
-        return render_template('perfil_jefe.html')
+
 
 #Aqui comienza la logica para los contactos de emergencias, imitando a cargas familiares
     @app.route('/contactos_emergencias', methods=['GET', 'POST','DELETE'])
@@ -242,8 +229,9 @@ def register_routes(app, db):
         if not user_id:
             return redirect(url_for('login'))
         contacto = ContactoEmergencia.query.get(id_contacto)
+        usuario = Usuario.query.filter_by(rut = user_id)
         if contacto and (int(contacto.rut) == int(user_id)):
-            return render_template('eliminar_contacto.html', id_contacto=contacto.id, contacto = contacto)
+            return render_template('eliminar_contacto.html', id_contacto=contacto.id, contacto = contacto, usuario = usuario)
         return redirect(url_for('listar_contactos')) #El url_for('') contacto la url donde esta el metodo '' (argumento del url_for('') )
     
     @app.route('/eliminar_contacto/confirmar/<int:id>', methods=['POST', 'DELETE'])  #Actualmente este esta borrando, el argumento de @app.route() es la url, referenciada directamente en los fetch de javascript
@@ -254,3 +242,169 @@ def register_routes(app, db):
             db.session.commit()
             flash('contacto eliminado exitosamente', 'success')
             return redirect(url_for('listar_contactos'))
+        
+
+    ######################################################################
+
+        
+    @bp.route('/Personal_rrhh/agregar', methods=['GET', 'POST'])
+    @login_required
+    def agregar_usuario():
+        user_id = session.get('user_id') #Confirma si la sesion está iniciada
+        if not user_id:
+            return redirect(url_for('login'))
+        usuario = Usuario.query.filter_by(rut=user_id).first()
+        if request.method == 'POST':
+            rut = request.form.get('rut')
+            dv = request.form.get('dv')
+            username = request.form.get('username')
+            password = request.form.get('password')  # Recuerda que debes hashear la contraseña antes de guardarla
+            # Hashear la contraseña
+            password_hashed = hashlib.md5(password.encode()).hexdigest()
+            role = request.form.get('role')
+            
+            nombre_completo = request.form.get('nombre_completo')
+            sexo = request.form.get('sexo')
+            direccion = request.form.get('direccion')
+            telefono = request.form.get('telefono')
+
+            cargo = request.form.get('cargo')
+            fecha_ingreso = request.form.get('fecha_ingreso')
+            area = request.form.get('area')
+            departamento = request.form.get('departamento')
+
+            nombre_contacto = request.form.get('nombre_contacto')
+            relacion_contacto = request.form.get('relacion_contacto')
+            telefono_contacto = request.form.get('telefono_contacto')
+
+            nombre_carga = request.form.get('nombre_carga')
+            parentesco = request.form.get('parentesco')
+            sexo_carga = request.form.get('sexo_carga')
+            rut_carga = request.form.get('rut_carga')
+
+            # Crear las instancias de los modelos
+            usuario = Usuario(rut=rut, dv=dv, username=username, password=password_hashed, role=role)
+            datos_personales = DatosPersonales(nombre_completo=nombre_completo, sexo=sexo, direccion=direccion, telefono=telefono, rut=rut)
+            datos_laborales = DatosLaborales(cargo=cargo, fecha_ingreso=fecha_ingreso, area=area, departamento=departamento, rut=rut)
+
+            usuario.datos_personales = datos_personales
+            usuario.datos_laborales = datos_laborales
+
+            if nombre_contacto and relacion_contacto and telefono_contacto:
+                contacto_emergencia = ContactoEmergencia(nombre=nombre_contacto, relacion=relacion_contacto, telefono=telefono_contacto, rut=rut)
+                usuario.contacto_emergencia = contacto_emergencia
+
+            if nombre_carga and parentesco and sexo_carga and rut_carga:
+                cargas_familiares = CargasFamiliares(nombre=nombre_carga, parentesco=parentesco, sexo=sexo_carga, rut=rut_carga, usuario_rut=rut)
+                usuario.cargas_familiares.append(cargas_familiares)
+
+            try:
+                db.session.add(usuario)
+                db.session.commit()
+                flash('Usuario agregado exitosamente')
+                return redirect(url_for('bp.listar_usuarios'))
+            except Exception as e:
+                db.session.rollback()
+                flash('Error al agregar el usuario: ' + str(e))
+
+        return render_template('agregar_usuario.html', usuario=usuario) #usuario para mantener la sesion iniciada. corresponde al del personal de rrhh
+
+    @bp.route('/Personal_rrhh/actualizar/<int:rut>', methods=['GET', 'POST'])
+    @login_required
+    def actualizar_usuario(rut):
+        usuario = Usuario.query.filter_by(rut=rut).first()
+        if request.method == 'POST':
+            usuario.dv = request.form.get('dv')
+            usuario.username = request.form.get('username')
+            usuario.password = request.form.get('password')  # Recuerda que debes hashear la contraseña antes de guardarla
+            usuario.role = request.form.get('role')
+
+            usuario.datos_personales.nombre_completo = request.form.get('nombre_completo')
+            usuario.datos_personales.sexo = request.form.get('sexo')
+            usuario.datos_personales.direccion = request.form.get('direccion')
+            usuario.datos_personales.telefono = request.form.get('telefono')
+
+            usuario.datos_laborales.cargo = request.form.get('cargo')
+            usuario.datos_laborales.fecha_ingreso = request.form.get('fecha_ingreso')
+            usuario.datos_laborales.area = request.form.get('area')
+            usuario.datos_laborales.departamento = request.form.get('departamento')
+
+            usuario.contacto_emergencia.nombre = request.form.get('nombre_contacto')
+            usuario.contacto_emergencia.relacion = request.form.get('relacion_contacto')
+            usuario.contacto_emergencia.telefono = request.form.get('telefono_contacto')
+
+            usuario.cargas_familiares.nombre = request.form.get('nombre_carga')
+            usuario.cargas_familiares.parentesco = request.form.get('parentesco')
+            usuario.cargas_familiares.sexo = request.form.get('sexo_carga')
+            usuario.cargas_familiares.rut = request.form.get('rut_carga')
+
+            try:
+                db.session.commit()
+                flash('Usuario actualizado exitosamente')
+                return redirect(url_for('bp.listar_usuarios'))
+            except Exception as e:
+                db.session.rollback()
+                flash('Error al actualizar el usuario: ' + str(e))
+
+        return render_template('actualizar_usuario.html', usuario=usuario)
+
+    @bp.route('/Personal_rrhh/listar', methods=['GET'])
+    @login_required
+    def listar_usuarios():
+        user_id = session.get('user_id')
+        if not user_id:
+            return redirect(url_for('login'))
+        usuario = Usuario.query.filter_by(rut=user_id).first()
+        usuarios = Usuario.query.all()
+        return render_template('listar_usuarios.html', usuarios=usuarios, usuario = usuario)
+    
+##############################################################3
+    
+    @bp.route('/jefe_rrhh/filtrar_usuarios', methods=['GET', 'POST'])
+    @login_required
+    def filtrar_usuarios():
+        user_id = session.get('user_id')
+        if not user_id:
+            return redirect(url_for('login'))
+        usuario = Usuario.query.filter_by(rut=user_id).first()
+        usuarios = []
+         # Obtener todos los cargos, áreas y departamentos únicos de la base de datos
+        cargos = db.session.query(DatosLaborales.cargo).distinct().all()
+        areas = db.session.query(DatosLaborales.area).distinct().all()
+        departamentos = db.session.query(DatosLaborales.departamento).distinct().all()
+
+        # Convertir los resultados de las consultas en listas simples
+        lista_cargos = [cargo[0] for cargo in cargos]
+        lista_areas = [area[0] for area in areas]
+        lista_departamentos = [departamento[0] for departamento in departamentos]
+        if request.method == 'POST':
+            sexo = request.form.get('sexo')
+            cargo = request.form.get('cargo')
+            area = request.form.get('area')
+            departamento = request.form.get('departamento')
+            buscador = request.form.get('buscador')
+            query = Usuario.query.join(DatosPersonales).join(DatosLaborales)
+            
+            if sexo:
+                query = query.filter(DatosPersonales.sexo == sexo)
+            if cargo:
+                query = query.filter(DatosLaborales.cargo == cargo)
+            if area:
+                query = query.filter(DatosLaborales.area == area)
+            if departamento:
+                query = query.filter(DatosLaborales.departamento == departamento)
+            
+            if buscador:
+                query = query.filter(
+                    (Usuario.rut.like(f"%{buscador}%")) |
+                    (DatosPersonales.nombre_completo.like(f"%{buscador}%")) |
+                    (DatosLaborales.cargo.like(f"%{buscador}%")) |
+                    (DatosLaborales.area.like(f"%{buscador}%")) |
+                    (DatosLaborales.departamento.like(f"%{buscador}%"))
+            )
+            print(query)
+            usuarios = query.all()
+        if request.method == 'GET' or not request.form:
+            usuarios = Usuario.query.join(DatosPersonales).join(DatosLaborales).all()    
+
+        return render_template('jefe_rrhh.html',usuario = usuario, usuarios=usuarios, lista_cargos=lista_cargos, lista_areas=lista_areas, lista_departamentos=lista_departamentos)

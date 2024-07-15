@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Actualizar Usuario{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Actualizar Usuario</h2>
+    <form action="{{ url_for('bp.actualizar_usuario', rut=usuario.rut) }}" method="POST">
+        <h3>Datos del Usuario</h3>
+        <label for="dv" class="form-label">Dígito Verificador: </label>
+        <input class="form-control" type="text" name="dv" value="{{ usuario.dv }}" required="required" placeholder="DV" id="dv">
+
+        <label for="username" class="form-label">Nombre de Usuario: </label>
+        <input class="form-control" type="text" name="username" value="{{ usuario.username }}" required="required" placeholder="Nombre de Usuario" id="username">
+
+        <label for="password" class="form-label">Contraseña: </label>
+        <input class="form-control" type="password" name="password" required="required" placeholder="Contraseña" id="password">
+
+        <label for="role" class="form-label">Rol: </label>
+        <input class="form-control" type="text" name="role" value="{{ usuario.role }}" required="required" placeholder="Rol" id="role">
+
+        <h3>Datos Personales</h3>
+        <label for="nombre_completo" class="form-label">Nombre Completo: </label>
+        <input class="form-control" type="text" name="nombre_completo" value="{{ usuario.datos_personales.nombre_completo }}" required="required" placeholder="Nombre Completo" id="nombre_completo">
+
+        <label for="sexo" class="form-label">Sexo: </label>
+        <input class="form-control" type="text" name="sexo" value="{{ usuario.datos_personales.sexo }}" required="required" placeholder="Sexo" id="sexo">
+
+        <label for="direccion" class="form-label">Dirección: </label>
+        <input class="form-control" type="text" name="direccion" value="{{ usuario.datos_personales.direccion }}" required="required" placeholder="Dirección" id="direccion">
+
+        <label for="telefono" class="form-label">Teléfono: </label>
+        <input class="form-control" type="text" name="telefono" value="{{ usuario.datos_personales.telefono }}" required="required" placeholder="Teléfono" id="telefono">
+
+        <h3>Datos Laborales</h3>
+        <label for="cargo" class="form-label">Cargo: </label>
+        <input class="form-control" type="text" name="cargo" value="{{ usuario.datos_laborales.cargo }}" required="required" placeholder="Cargo" id="cargo">
+
+        <label for="fecha_ingreso" class="form-label">Fecha de Ingreso: </label>
+        <input class="form-control" type="date" name="fecha_ingreso" value="{{ usuario.datos_laborales.fecha_ingreso }}" required="required" placeholder="Fecha de Ingreso" id="fecha_ingreso">
+
+        <label for="area" class="form-label">Área: </label>
+        <input class="form-control" type="text" name="area" value="{{ usuario.datos_laborales.area }}" required="required" placeholder="Área" id="area">
+
+        <label for="departamento" class="form-label">Departamento: </label>
+        <input class="form-control" type="text" name="departamento" value="{{ usuario.datos_laborales.departamento }}" required="required" placeholder="Departamento" id="departamento">
+
+        <h3>Contacto de Emergencia (Opcional)</h3>
+        <label for="nombre_contacto" class="form-label">Nombre del Contacto: </label>
+        <input class="form-control" type="text" name="nombre_contacto" value="{{ usuario.contacto_emergencia.nombre }}" placeholder="Nombre del Contacto" id="nombre_contacto">
+        <label for="relacion_contacto" class="form-label">Relación: </label>
+        <input class="form-control" type="text" name="relacion_contacto" value="{{ usuario.contacto_emergencia.relacion }}" placeholder="Relación" id="relacion_contacto">
+    
+        <label for="telefono_contacto" class="form-label">Teléfono del Contacto: </label>
+        <input class="form-control" type="text" name="telefono_contacto" value="{{ usuario.contacto_emergencia.telefono }}" placeholder="Teléfono del Contacto" id="telefono_contacto">
+    
+        <h3>Cargas Familiares (Opcional)</h3>
+        <label for="nombre_carga" class="form-label">Nombre de la Carga: </label>
+        <input class="form-control" type="text" name="nombre_carga" value="{{ usuario.cargas_familiares.nombre }}" placeholder="Nombre de la Carga" id="nombre_carga">
+
+        <label for="parentesco" class="form-label">Parentesco: </label>
+        <input class="form-control" type="text" name="parentesco" value="{{ usuario.cargas_familiares.parentesco }}" placeholder="Parentesco" id="parentesco">
+
+        <label for="sexo_carga" class="form-label">Sexo: </label>
+        <input class="form-control" type="text" name="sexo_carga" value="{{ usuario.cargas_familiares.sexo }}" placeholder="Sexo" id="sexo_carga">
+
+        <label for="rut_carga" class="form-label">RUT: </label>
+        <input class="form-control" type="text" name="rut_carga" value="{{ usuario.cargas_familiares.rut }}" placeholder="RUT de la Carga" id="rut_carga">
+
+        <input class="btn btn-primary" type="submit" value="Actualizar">
+    </form>
+</div>
+{% endblock %}

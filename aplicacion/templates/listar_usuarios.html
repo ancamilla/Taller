@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Listar Usuarios{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Lista de Usuarios</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>RUT</th>
+                <th>Nombre de Usuario</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.rut }}</td>
+                <td>{{ usuario.username }}</td>
+                <td>{{ usuario.role }}</td>
+                <td>
+                    <a href="{{ url_for('bp.actualizar_usuario', rut=usuario.rut) }}" class="btn btn-primary">Actualizar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
