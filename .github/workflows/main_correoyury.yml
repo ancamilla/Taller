@@ -18,17 +18,18 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python version
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
       - name: Create and start virtual environment
         run: |
+          cd aplicacion
           python -m venv venv
           source venv/bin/activate
-      
+
       - name: Install dependencies
-        run: | 
+        run: |
           cd aplicacion
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -36,7 +37,7 @@ jobs:
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: aplicacion/
@@ -48,18 +49,14 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write # This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      - name: Change directory to aplicacion
-        run: cd aplicacion
-
-      
       - name: Login to Azure
         uses: azure/login@v1
         with:
@@ -73,4 +70,3 @@ jobs:
         with:
           app-name: 'correoyury'
           slot-name: 'Production'
-          
