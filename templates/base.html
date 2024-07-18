@@ -39,12 +39,22 @@
                   <li><a class="dropdown-item" href="{{ url_for('agregar_contactos')}}">Agregar</a></li>
                 </ul>
               </li>
+              {% if session['role'] == 'PersonalRRHH' %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('perfil_personal_rrhh') }}">Personal RRHH</a>
+              </li>
+              {% elif session['role'] == 'JefeRRHH' %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('bp.filtrar_usuarios') }}">Filtrar Usuarios</a>
+              </li>
+              {% endif %}
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('logout')}}">Cerrar sesión</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">{{ usuario.id }}</a>
+                <a class="nav-link" href="#">{{ session['user_id'] }}</a>
               </li>
+              
       
             </ul>
           </div>

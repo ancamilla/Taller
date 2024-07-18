@@ -30,6 +30,7 @@ def login_post():
     session['loggedin']=True
     session['user_id'] = usuario.rut
     session['username'] = usuario.username
+    session['role'] = usuario.role
     print(f"Usuario {username} logueado exitosamente. este mensaje es del auth.py")
     login_user(usuario, remember=remember)
                 # Ejemplo de redirección basada en el rol del usuario
