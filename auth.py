@@ -4,7 +4,6 @@ from app import db
 from models import Usuario
 from hashlib import md5
 
-
 auth = Blueprint('auth', __name__)
 
 @auth.route('/login')
@@ -21,10 +20,11 @@ def login_post():
     hashed_password = md5(password.encode('utf-8')).hexdigest()
     usuario = Usuario.query.filter_by(rut=int(username)).first()
 
-    # check if the user actually exists
-    # take the user-supplied password, hash it, and compare it to the hashed password in the database
+    # Revisa si el usuario existe
+    # toma la contraseña ingresada, la hashea y compara con la almacenada en la base datos
     if not usuario or not (usuario.password == hashed_password):
-        return redirect(url_for('auth.login')) # if the user doesn't exist or password is wrong, reload the page
+        flash('Hubo un problema con su usuario/contraseña', 'danger')
+        return redirect(url_for('auth.login')) # Si el usuario o la contraseña son incorrectos recarga la pagina del login
 
     # if the above check passes, then we know the user has the right credentials
     session['loggedin']=True
